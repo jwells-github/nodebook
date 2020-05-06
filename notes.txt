@@ -1,0 +1,32 @@
+users
+            has posts
+                has comments
+                    has user
+                has likes   
+                    has user
+    has friends
+    has friend requests
+    has a username
+    has a password
+    has a birthday
+    has things they've liked
+    has 
+
+profiles
+
+likes
+
+friends
+
+news feed
+
+Users must sign in to see anything except the sign in page.
+
+Users should be able to sign in using their real facebook details
+
+
+    models
+        user
+        posts
+        
+            
