@@ -7,6 +7,7 @@ var UserSchema = new Schema(
         first_name: {type: String, required: true,},
         surname: {type: String, required: true,},
         email: {type: String, required: true},
+        password: {type: String, required: true, min:4,},
         joined_date: { type: Date, default: Date.now },
         birthday: {type: Date},
         friends: {type: Schema.Types.ObjectId, ref:'User'},
