@@ -12,6 +12,7 @@ var UserSchema = new Schema(
         birthday: {type: Date},
         friends: {type: Schema.Types.ObjectId, ref:'User'},
         friend_requests: {type: Schema.Types.ObjectId, ref:'User'},
+        is_verified: {type: Boolean, default: false}
     }
 );
 
