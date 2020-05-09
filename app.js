@@ -22,6 +22,7 @@ var usersRouter = require('./routes/users');
 
 //var passport    = require('passport');  
 //require('./passport');
+var flash = require('connect-flash');
 
 var app = express();
 
@@ -38,6 +39,7 @@ app.use(express.urlencoded({ extended: false }));
 
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(flash());
 
 passport.use(
           new LocalStrategy({
@@ -48,7 +50,10 @@ passport.use(
                 return done(err);
               }
               if (!user) {
-                return done(null, false, { msg: "Incorrect username" });
+                return done(null, false, { message: "Incorrect username" });
+              }
+              if(!user.is_verified){
+                 return done(null, false, {message: 'Email must be verified'});
               }
               bcrypt.compare(password, user.password, (err, res) => {
                 if (err){
@@ -59,12 +64,10 @@ passport.use(
                   return done(null, user)
                 } else {
                   // passwords do not match!
-                  return done(null, false, {msg: "Incorrect password"})
+                  return done(null, false, {message: "Incorrect password"})
                 }
               })
-              if(!user.is_verified){
-                return done(null, false, {msg: ""})
-              }
+
               return done(null, user);
             });
           })

@@ -3,6 +3,7 @@ extends layout
 block content
   h1=title
 
+
   form(method='POST' action='')
     div.form-group
       label(for='email') Email:
@@ -12,6 +13,7 @@ block content
       input#password.form-control(type='password' placeholder='Password' 
         name='password' required='true')
     button.btn.btn-primary(type='submit') Submit
+  .error #{message}
   if errors 
     ul
       for error in errors
