@@ -67,7 +67,6 @@ exports.user_create_post = [
 							text: 'Hello,\n\n' + 'Please verify your account by clicking the link: \nhttp:\/\/' + req.headers.host + '\/signup\/confirmation\/' + token.token + '.\n' };
 							transporter.sendMail(mailOptions, function (err) {
   							if (err) { return next(err); }
-  							  console.log("User saved");
 					    	  res.redirect('/');
 					  	});   
 						});
@@ -106,6 +105,73 @@ exports.email_confirmation = function(req,res,next){
     });
   });
 };
+
+exports.email_confirmation_resend_get = function(req,res,next){
+		if (res.locals.currentUser){
+				res.redirect('/');
+		}
+		res.render('email_confirmation_resend_form', {title: 'Resend Email Confirmation'});
+};
+
+exports.email_confirmation_resend_post = [
+  body('email', 'Require an Email').trim().isEmail(),
+  body('password', 'Password must be longer than 4 characters').trim().notEmpty(),
+  sanitizeBody('*').escape(),
+  (req,res,next) => {
+    const errors = validationResult(req);
+      if(!errors.isEmpty()){
+        res.render('email_confirmation_resend_form', {title: 'Resend Email Confirmation', errors:errors.array()});
+        return;
+      }
+      else{
+        User.findOne({ email: req.body.email }, function (err, user) {
+          if(err){return next(err);}
+          if (!user){
+            return res.status(400).send({ msg: 'We were unable to find a user with that email.' });
+          } 
+          bcrypt.compare(req.body.password, user.password, (err, data) => {
+            if (err){
+              console.log("error");
+              return;
+            }
+            if (data) {
+              if (user.isVerified){
+                 res.render('email_confirmation_resend_form', {title: 'Email already verified', errors:errors.array()});
+                 return;
+              } 
+              // Create a verification token, save it, and send email
+              var token = new Token({ _userId: user._id, token: crypto.randomBytes(16).toString('hex') });
+    
+              // Save the token
+              token.save(function (err) {
+                if (err) { return next(err) }
+                // Send the email
+  	            var transporter = nodemailer.createTransport({ service: 'Gmail', auth: { user: process.env.MY_TESTING_EMAIL, pass: process.env.MY_TESTING_EMAIL_PASSSWORD } });
+  							var mailOptions = { from: 'no-reply@localhost.com',
+  							to: user.email, 
+  							subject: 'Account Verification Token', 
+  							text: 'Hello,\n\n' + 'Please verify your account by clicking the link: \nhttp:\/\/' + req.headers.host + '\/signup\/confirmation\/' + token.token + '.\n' };
+                transporter.sendMail(mailOptions, function (err) {
+                  if (err) { return next(err); }
+                  req.flash('info','Email Verification Resent');
+                  res.redirect('/');
+                });
+
+              });
+            } 
+            else {
+              // passwords do not match!
+              req.flash('info','Incorrect password');
+              res.render('email_confirmation_resend_form', {title: 'Resend Email Confirmation', message: req.flash('info')});
+              return;
+            }
+          });
+          
+        });
+      }
+
+  }
+];
 
 exports.email_confirmation_resend = function (req, res, next) {
     req.assert('email', 'Email is not valid').isEmail();

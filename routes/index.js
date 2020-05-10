@@ -6,16 +6,20 @@ var login_controller =  require('../controllers/loginController');
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
-  res.render('index', { title: 'Express' });
+  res.render('index', { title: 'Express', message: req.flash('info') });
 });
 
 router.get('/signup', signup_controller.user_create_get);
 
 router.post('/signup', signup_controller.user_create_post);
 
+router.get('/signup/confirmation/resend', signup_controller.email_confirmation_resend_get);
+
+router.post('/signup/confirmation/resend', signup_controller.email_confirmation_resend_post);
+
 router.get('/signup/confirmation/:token', signup_controller.email_confirmation);
 
-router.post('/signup/resend', signup_controller.email_confirmation_resend);
+
 
 router.get('/login',login_controller.user_login_get );
 
