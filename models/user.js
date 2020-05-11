@@ -16,4 +16,16 @@ var UserSchema = new Schema(
     }
 );
 
+UserSchema
+.virtual('url')
+.get(function(){
+    return '/users/' + this._id;
+});
+
+UserSchema
+.virtual('full_name')
+.get(function(){
+    return this.first_name + " " + this.surname;
+});
+
 module.exports = mongoose.model('User', UserSchema);

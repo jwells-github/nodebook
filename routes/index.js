@@ -3,11 +3,12 @@ var router = express.Router();
 
 var signup_controller = require('../controllers/signupController');
 var login_controller =  require('../controllers/loginController');
+var dashboard_controller = require('../controllers/dashboardController')
 
 /* GET home page. */
-router.get('/', function(req, res, next) {
-  res.render('index', { title: 'Express', message: req.flash('info') });
-});
+router.get('/', dashboard_controller.dashboard_get );
+
+router.post('/', dashboard_controller.dashboard_post)
 
 router.get('/signup', signup_controller.user_create_get);
 

@@ -1,0 +1,12 @@
+extends layout
+
+block content   
+    h1 User: #{user.full_name}
+    
+    ul 
+        each post in user_posts
+            li 
+                p= post.author
+                p= post.content
+
+    

@@ -70,8 +70,11 @@ passport.use(
 
               return done(null, user);
             });
+          
+            
           })
 );
+
 
 passport.serializeUser(function(user, done) {
     done(null, user.id);
