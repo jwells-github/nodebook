@@ -7,7 +7,7 @@ exports.user_list = function (req,res,next){
   User.find()
   .exec(function (err, list_users){
     if (err){return next(err)}
-    console.log("hmm " + list_users)
+
     res.render('user_list', {title: 'User List', user_list: list_users});
   });
 };

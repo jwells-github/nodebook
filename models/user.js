@@ -10,8 +10,8 @@ var UserSchema = new Schema(
         password: {type: String, required: true, min:4,},
         joined_date: { type: Date, default: Date.now },
         birthday: {type: Date},
-        friends: {type: Schema.Types.ObjectId, ref:'User'},
-        friend_requests: {type: Schema.Types.ObjectId, ref:'User'},
+        friends: [{type: Schema.Types.ObjectId, ref:'User'}],
+        friend_requests: [{type: Schema.Types.ObjectId, ref:'User'}],
         is_verified: {type: Boolean, default: false}
     }
 );

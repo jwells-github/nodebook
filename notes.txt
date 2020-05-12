@@ -9,13 +9,16 @@ users
     has a username
     has a password
     has a birthday
-    has things they've liked
+    has things they've liked    
+        can have a model 'liked'
+            has a post and has users
+            
     has 
 
 profiles
 
 likes
-
+    
 friends
 
 news feed
@@ -29,4 +32,8 @@ Users should be able to sign in using their real facebook details
         user
         posts
         
-            
+        
+          for post in userPosts
+    p= post.content
+        
+                

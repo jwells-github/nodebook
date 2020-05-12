@@ -8,7 +8,9 @@ var dashboard_controller = require('../controllers/dashboardController')
 /* GET home page. */
 router.get('/', dashboard_controller.dashboard_get );
 
-router.post('/', dashboard_controller.dashboard_post)
+router.post('/', dashboard_controller.dashboard_post);
+
+router.post('/comment', dashboard_controller.comment_post);
 
 router.get('/signup', signup_controller.user_create_get);
 
@@ -19,8 +21,6 @@ router.get('/signup/confirmation/resend', signup_controller.email_confirmation_r
 router.post('/signup/confirmation/resend', signup_controller.email_confirmation_resend_post);
 
 router.get('/signup/confirmation/:token', signup_controller.email_confirmation);
-
-
 
 router.get('/login',login_controller.user_login_get );
 

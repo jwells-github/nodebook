@@ -16,5 +16,23 @@ block content
       ul
         for error in errors
           li!= error.msg
+  if userPosts
+    for post in userPosts
+      h3= post.author.full_name
+      p= post.content
+      p= post.posted_date
+      h4 comments
+      for comment in post.comments
+        h4=comment.author.full_name
+        p=comment.content
+        p=comment.posted_date
+      p Make a comment
+      form(method='POST' action='/comment')
+        div.form-group
+          textarea#content.form-control(type='textarea', placeholder='Type your post here'
+            name='content' required='true') #{value=undefined===comment ? '' :post.content}
+          input#postid.form-control(type="hidden", name="postid", value=post.id)
+        button.btn.btn-primary(type='submit') Submit
+
           
   
