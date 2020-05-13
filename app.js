@@ -57,7 +57,7 @@ passport.use(
               }
               bcrypt.compare(password, user.password, (err, res) => {
                 if (err){
-                  return;
+                  return done(err);
                 }
                 if (res) {
                   // passwords match! log user in
@@ -77,12 +77,12 @@ passport.use(
 
 
 passport.serializeUser(function(user, done) {
-    done(null, user.id);
+    return done(null, user.id);
 });
 
 passport.deserializeUser(function(id, done) {
     User.findById(id, function(err, user) {
-    done(err, user);
+    return done(err, user);
     });
 });
 
@@ -92,6 +92,7 @@ app.use(passport.session());
 app.use(function(req, res, next) {
   res.locals.currentUser = req.user;
   next();
+  return
 });
 
 

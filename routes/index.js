@@ -12,6 +12,8 @@ router.post('/', dashboard_controller.dashboard_post);
 
 router.post('/comment', dashboard_controller.comment_post);
 
+router.post('/like', dashboard_controller.like);
+
 router.get('/signup', signup_controller.user_create_get);
 
 router.post('/signup', signup_controller.user_create_post);

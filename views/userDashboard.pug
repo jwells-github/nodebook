@@ -18,14 +18,41 @@ block content
           li!= error.msg
   if userPosts
     for post in userPosts
+      - var user_liked_post = false
       h3= post.author.full_name
       p= post.content
       p= post.posted_date
+      h5 Post liked by:
+      for post_like in post.likes
+        p= post_like.full_name
+        if post_like.id == currentUser.id
+          - user_liked_post = true
+      form(method='POST' action='/like')
+        div.form-group
+          input#postid.form-control(type="hidden", name="postid", value=post.id)
+        if !user_liked_post
+          button.btn.btn-primary(type='submit') Like Post
+        else
+          button.btn.btn-primary(type='submit') Unlike Post
       h4 comments
       for comment in post.comments
+        - var user_liked_comment
         h4=comment.author.full_name
         p=comment.content
         p=comment.posted_date
+        h5 Comment liked by:
+        for comment_like in comment.likes
+          p= comment_like.full_name
+          if comment_like.id == currentUser.id
+            - user_liked_comment = true
+        form(method='POST' action='/like')
+          div.form-group
+          input#postid.form-control(type="hidden", name="commentid", value=comment.id)
+          if !user_liked_comment
+            button.btn.btn-primary(type='submit') Like Comment
+          else
+            button.btn.btn-primary(type='submit') Unlike Comment
+          
       p Make a comment
       form(method='POST' action='/comment')
         div.form-group

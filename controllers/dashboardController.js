@@ -23,6 +23,7 @@ exports.dashboard_get = function(req,res,next){
       path:'comments',
       populate:{path:'likes'}
      })
+     .populate('likes')
     .exec(callback);
    },
   },
@@ -89,3 +90,52 @@ exports.comment_post = [
 
  }
  ];
+ 
+ exports.like = function(req,res,next){
+  if(res.locals.currentUser){
+   if(req.body.postid){
+    console.log("post liked")
+    Post.findOne({_id: req.body.postid}, function (err,post){
+     if(err){return next(err)}
+     if (post.likes.includes(res.locals.currentUser.id)){
+      post.likes.pull(res.locals.currentUser.id)
+      post.save(function(err){
+       if(err){return next(err)}
+       res.redirect('/');
+      })
+     }
+     else{
+      post.likes.push(res.locals.currentUser.id)
+      post.save(function(err){
+      if(err){return next(err)}
+       res.redirect('/');
+      })
+     }
+    })
+   }
+   else if(req.body.commentid){
+    console.log("comment liked")
+    Comment.findOne({_id: req.body.commentid}, function (err,comment){
+     if(err){return next(err)}
+     if (comment.likes.includes(res.locals.currentUser.id)){
+      comment.likes.pull(res.locals.currentUser.id)
+      comment.save(function(err){
+       if(err){return next(err)}
+       res.redirect('/');
+      })
+     }
+     else{
+      comment.likes.push(res.locals.currentUser.id)
+      comment.save(function(err){
+      if(err){return next(err)}
+       res.redirect('/');
+      })
+     }
+    })
+   }
+   
+  }
+  else{
+   return
+  }
+ }
