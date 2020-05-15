@@ -1,12 +1,20 @@
 extends layout
 
 block content  
-  h2 Pending Friend Requsts
-  for friend_req in user.friend_requests
-    ul
-      li
-        p=friend_req.full_name
-  for friend in user.friends
-    ul
-      li
-        p=friend.full_name
+  if user.friend_requests.length > 0
+    h2 Pending Friend Requsts
+    for friend_req in user.friend_requests
+      ul
+        li
+          a(href=friend_req.url) #{friend_req.full_name}
+          form(method='POST' action='')  
+            div.form-group
+              input#userid.form-control(type='hidden', name='friend_req_id', value=friend_req.id)
+              button.btn.btn-primary(type='submit' name="acceptButton") Accept Friend-Request
+              button.btn.btn-primary(type='submit' name="declineButton") Decline Friend-Request
+  if user.friends.length > 0 
+    h2 Friends
+    for friend in user.friends
+      ul
+        li
+          a(href=friend.url) #{friend.full_name}

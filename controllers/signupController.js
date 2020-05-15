@@ -64,7 +64,7 @@ exports.user_create_post = [
 							var mailOptions = { from: 'no-reply@localhost.com',
 							to: user.email, 
 							subject: 'Account Verification Token', 
-							text: 'Hello,\n\n' + 'Please verify your account by clicking the link: \nhttp:\/\/' + req.headers.host + '\/signup\/confirmation\/' + token.token + '.\n' };
+							text: 'Hello,\n\n' + 'Please verify your account by clicking the link: \nhttp:\/\/' + req.headers.host + '\/signup\/confirmation\/' + token.token + '\n' };
 							transporter.sendMail(mailOptions, function (err) {
   							if (err) { return next(err); }
 					    	  res.redirect('/');
@@ -150,7 +150,7 @@ exports.email_confirmation_resend_post = [
   							var mailOptions = { from: 'no-reply@localhost.com',
   							to: user.email, 
   							subject: 'Account Verification Token', 
-  							text: 'Hello,\n\n' + 'Please verify your account by clicking the link: \nhttp:\/\/' + req.headers.host + '\/signup\/confirmation\/' + token.token + '\n' };
+  							text: 'Hello,\n\n' + 'Please verify your account by clicking the link: \nhttp:\/\/' + req.headers.host + '\/signup\/confirmation\/' + token.token};
                 transporter.sendMail(mailOptions, function (err) {
                   if (err) { return next(err); }
                   req.flash('info','Email Verification Resent');

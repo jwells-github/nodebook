@@ -96,6 +96,7 @@ exports.friends_get = function(req,res,next){
   if(res.locals.currentUser){
     User.findById(res.locals.currentUser.id)
     .populate('friend_requests')
+    .populate('friends')
     .exec(function(err, user){
       if(err){return next(err)}
       res.render('friend_list', {title: 'Friend List', user:user});
@@ -104,4 +105,39 @@ exports.friends_get = function(req,res,next){
   else{
     res.redirect('/');
   }
+};
+
+exports.friends_post = function(req,res,next){
+  if(res.locals.currentUser){
+    if(req.body.friend_req_id){
+      if(req.body.acceptButton !== undefined ){
+        User.findOne({_id: res.locals.currentUser.id}, function(err,user){
+          if (err){return next(err)}
+          user.friend_requests.pull(req.body.friend_req_id);
+          user.friends.push(req.body.friend_req_id);
+          user.save(function(err){
+            if(err){return next(err)}
+            res.redirect('/users/friends');
+          });
+        });
+      }
+      else if(req.body.declineButton !== undefined ){
+        User.findOne({_id: res.locals.currentUser.id}, function(err,user){
+          if (err){return next(err)}
+          user.friend_requests.pull(req.body.friend_req_id);
+          user.save(function(err){
+          if(err){return next(err)}
+            res.redirect('/users/friends');
+          });
+        });
+      }
+    }
+    else{
+       res.redirect('/');
+    }
+  }
+  else{
+      res.redirect('/');
+  }
+
 };
