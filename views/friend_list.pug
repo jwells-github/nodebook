@@ -1,0 +1,12 @@
+extends layout
+
+block content  
+  h2 Pending Friend Requsts
+  for friend_req in user.friend_requests
+    ul
+      li
+        p=friend_req.full_name
+  for friend in user.friends
+    ul
+      li
+        p=friend.full_name

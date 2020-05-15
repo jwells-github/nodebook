@@ -4,12 +4,17 @@ var Post = require ('../models/post');
  
  
 exports.user_list = function (req,res,next){
-  User.find()
-  .exec(function (err, list_users){
-    if (err){return next(err)}
-
-    res.render('user_list', {title: 'User List', user_list: list_users});
-  });
+  if(res.locals.currentUser){
+    User.find()
+    .exec(function (err, list_users){
+      if (err){return next(err)}
+  
+      res.render('user_list', {title: 'User List', user_list: list_users});
+    });
+  }
+  else{
+    res.redirect('/')
+  }
 };
 
 exports.user_profile = function(req,res,next){
@@ -54,4 +59,49 @@ exports.user_profile = function(req,res,next){
     });
   });
 
+};
+
+
+// user.friend_requests
+exports.send_friend_request = function(req,res,next){
+  if(res.locals.currentUser){
+    console.log('send friend req')
+    if(req.body.userid){
+      if(req.body.userid == res.locals.currentUser.id){
+        res.redirect('/users');
+      }
+      User.findOne({_id: req.body.userid}, function(err,user){
+        if(err){return next(err)}
+        if(user.friend_requests.includes(res.locals.currentUser.id)){
+          user.friend_requests.pull(res.locals.currentUser.id);
+          user.save(function(err){
+            if(err){return next(err)}
+            res.redirect('/users');
+          });
+        }
+        else{
+          user.friend_requests.push(res.locals.currentUser.id);
+          user.save(function(err){
+            if(err){return next(err)}
+            res.redirect('/users');
+          });
+        }
+
+      });
+    }
+  }
+};
+
+exports.friends_get = function(req,res,next){
+  if(res.locals.currentUser){
+    User.findById(res.locals.currentUser.id)
+    .populate('friend_requests')
+    .exec(function(err, user){
+      if(err){return next(err)}
+      res.render('friend_list', {title: 'Friend List', user:user});
+    });
+  }
+  else{
+    res.redirect('/');
+  }
 };
