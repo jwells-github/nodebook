@@ -17,6 +17,9 @@ exports.user_list = function (req,res,next){
 };
 
 exports.user_profile = function(req,res,next){
+  if(!res.locals.currentUser){
+    res.redirect('/');
+  }
   async.parallel({
     user: function(callback){
       User.findById(req.params.id)
@@ -24,25 +27,12 @@ exports.user_profile = function(req,res,next){
       .populate('friend_requests')
       .exec(callback);
       },
-    user_posts: function(callback){
-      Post.find({'author' : req.params.id})
+    userPosts: function(callback){
+      Post.find({$or: [{'author' : req.params.id}, {'likes':req.params.id}]})
       .populate("comments")
       .populate("likes")
       .populate("author")
-      .exec(callback);
-    },
-    liked_posts: function(callback){
-      Post.find({'likes': req.params.id})
-      .populate("comments")
-      .populate("likes")
-      .populate("author")
-      .exec(callback);
-    },
-    liked_comments: function(callback){
-      Post.find({'likes': req.params.id})
-      .populate("comments")
-      .populate("likes")
-      .populate("author")
+      .sort({'posted_date' : -1})
       .exec(callback);
     }
   },
@@ -54,7 +44,7 @@ exports.user_profile = function(req,res,next){
       return next(err);
     }
     res.render('user_profile', {title: results.user.full_name,
-                user: results.user, user_posts: results.user_posts
+                user: results.user, userPosts: results.userPosts
     });
   });
 
