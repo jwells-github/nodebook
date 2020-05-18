@@ -7,7 +7,7 @@ block content
       div(class='col')
         if(currentUser.id == user.id)
           span Create a post
-          form(method='POST' action='')
+          form(method='POST' action='/')
             div.form-group
               textarea#content.form-control(type='textarea', placeholder='Type your post here'
                 name='content' required='true') #{value=undefined===post ? '' :post.content}

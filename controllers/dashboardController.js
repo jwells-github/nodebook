@@ -58,7 +58,8 @@ exports.dashboard_post = [
   else{
    post.save(function(err){
     if(err){return next(err);}
-    res.redirect('/');
+    var backURL=req.header('Referer') || '/';
+    res.redirect(backURL);
    });
   }
  }
