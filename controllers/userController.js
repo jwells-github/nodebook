@@ -8,12 +8,11 @@ exports.user_list = function (req,res,next){
     User.find()
     .exec(function (err, list_users){
       if (err){return next(err)}
-  
       res.render('user_list', {title: 'User List', user_list: list_users});
     });
   }
   else{
-    res.redirect('/')
+    res.redirect('/');
   }
 };
 
@@ -115,6 +114,13 @@ exports.friends_post = function(req,res,next){
           if (err){return next(err)}
           user.friend_requests.pull(req.body.friend_req_id);
           user.friends.push(req.body.friend_req_id);
+          user.save(function(err){
+            if(err){return next(err)}
+          });
+        });
+        User.findOne({_id: req.body.friend_req_id}, function(err,user){
+          if(err){return next(err)}
+          user.friends.push(res.locals.currentUser.id);
           user.save(function(err){
             if(err){return next(err)}
             res.redirect('/users/friends');

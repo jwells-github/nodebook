@@ -2,6 +2,7 @@ const { body,validationResult } = require('express-validator/check');
 const { sanitizeBody } = require('express-validator/filter');
 
 var Post = require('../models/post');
+var User = require('../models/user');
 var Comment = require('../models/comment');
 var async = require('async');
 
@@ -10,9 +11,16 @@ exports.dashboard_get = function(req,res,next){
    res.render('guestDashboard', {title: "Welcome to Nodebook", message: req.flash('info')});
  }
  else{
+  console.log(res.locals.currentUser.friends[1]);
+  var usersToDisplay = [];
+  usersToDisplay.push(res.locals.currentUser.id);
+  for (var i = 0; i < res.locals.currentUser.friends.length; i++) {
+   usersToDisplay.push(res.locals.currentUser.friends[i]);
+   console.log(i + " " + usersToDisplay);
+  }
   async.parallel({
    userPosts: function (callback){
-    Post.find({'author' : res.locals.currentUser.id})
+    Post.find({'author' : usersToDisplay})
     .populate('author')
     .populate({
       path: 'comments',
@@ -23,6 +31,7 @@ exports.dashboard_get = function(req,res,next){
       populate:{path:'likes'}
      })
      .populate('likes')
+     .sort({'posted_date' : -1})
     .exec(callback);
    },
   },

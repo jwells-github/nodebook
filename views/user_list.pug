@@ -6,19 +6,25 @@ block content
   ul 
     for user in user_list
       - var user_friend_request = false
+    
+      - var users_are_friends = false
+      
       if user.id != currentUser.id
         for user_req in user.friend_requests
           if user_req == currentUser.id
             - user_friend_request = true
             
+        for user_friend in user.friends
+          if user_friend == currentUser.id
+            - users_are_friends = true
+            
         li  
            a(href=user.url) #{user.full_name}
-           form(method='POST' action='/users/friend_request')
-            div.form-group
-              input#userid.form-control(type='hidden', name='userid', value=user.id)
-              if !user_friend_request
-                button.btn.btn-primary(type='submit') Send Friend-Request
-              else
-                button.btn.btn-primary(type='submit') Rescind Friend-Request
-  
-            
+           if !users_are_friends
+             form(method='POST' action='/users/friend_request')
+              div.form-group
+                input#userid.form-control(type='hidden', name='userid', value=user.id)
+                if !user_friend_request
+                  button.btn.btn-primary(type='submit') Send Friend-Request
+                else
+                  button.btn.btn-primary(type='submit') Rescind Friend-Request
