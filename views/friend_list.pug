@@ -18,3 +18,8 @@ block content
       ul
         li
           a(href=friend.url) #{friend.full_name}
+          form(method='POST' action='/users/friend_delete')
+           div.form-group
+            input#userid.form-control(type='hidden', name='userid', value=friend.id)
+            button.btn.btn-primary(type='submit') Remove friend
+              

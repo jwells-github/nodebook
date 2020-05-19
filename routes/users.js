@@ -11,6 +11,8 @@ router.post('/friends', user_controller.friends_post);
 
 router.post('/friend_request',  user_controller.send_friend_request);
 
+router.post('/friend_delete', user_controller.friend_delete);
+
 router.get('/:id', user_controller.user_profile);
 
 

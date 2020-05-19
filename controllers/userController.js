@@ -54,7 +54,6 @@ exports.user_profile = function(req,res,next){
 // user.friend_requests
 exports.send_friend_request = function(req,res,next){
   if(res.locals.currentUser){
-    console.log('send friend req')
     if(req.body.userid){
       if(req.body.userid == res.locals.currentUser.id){
         res.redirect('/users');
@@ -136,4 +135,33 @@ exports.friends_post = function(req,res,next){
       res.redirect('/');
   }
 
+};
+
+exports.friend_delete = function(req,res,next){
+  if(res.locals.currentUser){
+    console.log('ab')
+    if(req.body.userid){
+      if(req.body.userid == res.locals.currentUser.id){
+        res.redirect('/users/friends');
+      }
+      User.findOne({_id: req.body.userid}, function(err,user){
+        if(err){return next(err)}
+         user.friends.pull(res.locals.currentUser.id);
+          user.save(function(err){
+            if(err){return next(err)}
+          });
+      });
+      User.findOne({_id: res.locals.currentUser.id}, function(err,user){
+        if(err){return next(err)}
+         user.friends.pull(req.body.userid);
+          user.save(function(err){
+            if(err){return next(err)}
+            res.redirect('/users/friends');
+          });
+      });
+    }
+  }
+  else{
+    res.redirect('/');
+  }
 };
