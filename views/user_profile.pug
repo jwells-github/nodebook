@@ -26,7 +26,7 @@ block content
             div(class='col-sm-8')
               h3= post.author.full_name
             div(class='col-sm-4')
-              p= post.posted_date
+              p= post.date_formatted
           p= post.content
          
           h5 Post liked by:
@@ -47,7 +47,7 @@ block content
             div(class='container border-primary' style='border:1px solid #cecece;')
               h4=comment.author.full_name
               p=comment.content
-              p=comment.posted_date
+              p=comment.date_formatted
               h5 Comment liked by:
               for comment_like in comment.likes
                 p= comment_like.full_name

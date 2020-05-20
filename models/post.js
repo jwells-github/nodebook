@@ -1,5 +1,6 @@
 var mongoose = require ('mongoose');
 var Schema = mongoose.Schema;
+var moment = require('moment');
 
 var PostSchema = new Schema(
     {
@@ -10,5 +11,11 @@ var PostSchema = new Schema(
         comments: [{type: Schema.Types.ObjectId, ref: 'Comment'}]
     }
 );
+
+PostSchema
+.virtual('date_formatted')
+.get(function(){
+    return moment(this.posted_date).format('LLL').toString();
+});
 
 module.exports = mongoose.model('Post', PostSchema);
