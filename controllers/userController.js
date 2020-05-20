@@ -2,7 +2,7 @@ var async = require('async');
 var User = require ('../models/user');
 var Post = require ('../models/post');
  
- 
+// Display a page with a list of all users
 exports.user_list = function (req,res,next){
   if(res.locals.currentUser){
     User.find()
@@ -16,17 +16,20 @@ exports.user_list = function (req,res,next){
   }
 };
 
+// Display the user's profile page
 exports.user_profile = function(req,res,next){
   if(!res.locals.currentUser){
     res.redirect('/');
   }
   async.parallel({
+    // Get User
     user: function(callback){
       User.findById(req.params.id)
       .populate('friends')
       .populate('friend_requests')
       .exec(callback);
       },
+    // Get user's posts and liked posts
     userPosts: function(callback){
       Post.find({$or: [{'author' : req.params.id}, {'likes':req.params.id}]})
       .populate("comments")
@@ -50,8 +53,7 @@ exports.user_profile = function(req,res,next){
 
 };
 
-
-// user.friend_requests
+// Send or rescind a friend request to another user
 exports.send_friend_request = function(req,res,next){
   if(res.locals.currentUser){
     if(req.body.userid){
@@ -60,6 +62,7 @@ exports.send_friend_request = function(req,res,next){
       }
       User.findOne({_id: req.body.userid}, function(err,user){
         if(err){return next(err)}
+        // Rescind a friend requst
         if(user.friend_requests.includes(res.locals.currentUser.id)){
           user.friend_requests.pull(res.locals.currentUser.id);
           user.save(function(err){
@@ -67,6 +70,7 @@ exports.send_friend_request = function(req,res,next){
             res.redirect('/users');
           });
         }
+        // Send a friend request
         else{
           user.friend_requests.push(res.locals.currentUser.id);
           user.save(function(err){
@@ -80,6 +84,7 @@ exports.send_friend_request = function(req,res,next){
   }
 };
 
+// Display a list of all of the logged in user's friends
 exports.friends_get = function(req,res,next){
   if(res.locals.currentUser){
     User.findById(res.locals.currentUser.id)
@@ -95,20 +100,26 @@ exports.friends_get = function(req,res,next){
   }
 };
 
+// Accept or decline a friend request
 exports.friends_post = function(req,res,next){
   if(res.locals.currentUser){
     if(req.body.friend_req_id){
+      // Accept button pressed
       if(req.body.acceptButton !== undefined ){
+        // Get logged in user
         User.findOne({_id: res.locals.currentUser.id}, function(err,user){
           if (err){return next(err)}
+          // Remove the friend request and add as a friend
           user.friend_requests.pull(req.body.friend_req_id);
           user.friends.push(req.body.friend_req_id);
           user.save(function(err){
             if(err){return next(err)}
           });
         });
+        // Get the user who sent the friend request
         User.findOne({_id: req.body.friend_req_id}, function(err,user){
           if(err){return next(err)}
+          // Add the logged in the user as a friend
           user.friends.push(res.locals.currentUser.id);
           user.save(function(err){
             if(err){return next(err)}
@@ -116,9 +127,11 @@ exports.friends_post = function(req,res,next){
           });
         });
       }
+      // Decline button pressed
       else if(req.body.declineButton !== undefined ){
         User.findOne({_id: res.locals.currentUser.id}, function(err,user){
           if (err){return next(err)}
+          // Remove friend request
           user.friend_requests.pull(req.body.friend_req_id);
           user.save(function(err){
           if(err){return next(err)}
@@ -137,22 +150,26 @@ exports.friends_post = function(req,res,next){
 
 };
 
+// Remove a friend
 exports.friend_delete = function(req,res,next){
   if(res.locals.currentUser){
-    console.log('ab')
     if(req.body.userid){
       if(req.body.userid == res.locals.currentUser.id){
         res.redirect('/users/friends');
       }
+      // Get the friend
       User.findOne({_id: req.body.userid}, function(err,user){
         if(err){return next(err)}
+        // Remove the logged in user as a friend
          user.friends.pull(res.locals.currentUser.id);
           user.save(function(err){
             if(err){return next(err)}
           });
       });
+      // Get the logged in user
       User.findOne({_id: res.locals.currentUser.id}, function(err,user){
         if(err){return next(err)}
+        // Remove the friend
          user.friends.pull(req.body.userid);
           user.save(function(err){
             if(err){return next(err)}

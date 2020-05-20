@@ -16,6 +16,7 @@ exports.user_create_get = function (req,res,next){
 		res.render('signup_form', {title: 'Signup'});
 };
 
+// Create a user
 exports.user_create_post = [
 		
 	body('first_name', 'Require a firstname').trim(),
@@ -46,20 +47,21 @@ exports.user_create_post = [
 				User.findOne({'email': req.body.email})
 				.exec(function(err,found_user){
 					if (err){ return next (err);}
+					// Check if the email already belongs to an account
 					if(found_user){
 					  console.log(found_user);
-						res.render('signup_form', {title: 'Username in use', errors:errors.array()});
+						res.render('signup_form', {title: 'Email in use', errors:errors.array()});
 					}
 					else{
 						user.save(function (err){
-
 						if(err){return next(err);}
+						// Create an email authentication token
 						var token = new Token({ _userId: user._id, token: crypto.randomBytes(16).toString('hex') });
-						
 						token.save(function (err){
 							if (err){
 									return next(err);
 							}
+							// Send a confirmation email with the token to the registered email address
 							var transporter = nodemailer.createTransport({ service: 'Gmail', auth: { user: process.env.MY_TESTING_EMAIL, pass: process.env.MY_TESTING_EMAIL_PASSSWORD } });
 							var mailOptions = { from: 'no-reply@localhost.com',
 							to: user.email, 
@@ -80,7 +82,7 @@ exports.user_create_post = [
 	}
 		
 ];
-
+// Process email confirmations
 exports.email_confirmation = function(req,res,next){
   // Find a matching token
   Token.findOne({ token: req.params.token }, function (err, token) {
@@ -113,6 +115,7 @@ exports.email_confirmation_resend_get = function(req,res,next){
 		res.render('email_confirmation_resend_form', {title: 'Resend Email Confirmation'});
 };
 
+// Resend email confirmation
 exports.email_confirmation_resend_post = [
   body('email', 'Require an Email').trim().isEmail(),
   body('password', 'Password must be longer than 4 characters').trim().notEmpty(),
@@ -129,6 +132,7 @@ exports.email_confirmation_resend_post = [
           if (!user){
             return res.status(400).send({ msg: 'We were unable to find a user with that email.' });
           } 
+          // Check the user's password is correct
           bcrypt.compare(req.body.password, user.password, (err, data) => {
             if (err){
               console.log("error");
@@ -160,7 +164,7 @@ exports.email_confirmation_resend_post = [
               });
             } 
             else {
-              // passwords do not match!
+              // passwords do not match
               req.flash('info','Incorrect password');
               res.render('email_confirmation_resend_form', {title: 'Resend Email Confirmation', message: req.flash('info')});
               return;
@@ -173,6 +177,7 @@ exports.email_confirmation_resend_post = [
   }
 ];
 
+/*
 exports.email_confirmation_resend = function (req, res, next) {
     req.assert('email', 'Email is not valid').isEmail();
     req.assert('email', 'Email cannot be blank').notEmpty();
@@ -204,4 +209,5 @@ exports.email_confirmation_resend = function (req, res, next) {
       });
     });
 };
-		
+
+*/

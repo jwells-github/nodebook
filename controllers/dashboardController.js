@@ -2,7 +2,6 @@ const { body,validationResult } = require('express-validator/check');
 const { sanitizeBody } = require('express-validator/filter');
 
 var Post = require('../models/post');
-var User = require('../models/user');
 var Comment = require('../models/comment');
 var async = require('async');
 
@@ -11,13 +10,14 @@ exports.dashboard_get = function(req,res,next){
    res.render('guestDashboard', {title: "Welcome to Nodebook", message: req.flash('info')});
  }
  else{
-  console.log(res.locals.currentUser.friends[1]);
+  // Create an array containing the ID of the user and their friends
   var usersToDisplay = [];
   usersToDisplay.push(res.locals.currentUser.id);
   for (var i = 0; i < res.locals.currentUser.friends.length; i++) {
    usersToDisplay.push(res.locals.currentUser.friends[i]);
    console.log(i + " " + usersToDisplay);
   }
+  // Get and populate all posts by the user and their friends
   async.parallel({
    userPosts: function (callback){
     Post.find({'author' : usersToDisplay})
@@ -42,9 +42,11 @@ exports.dashboard_get = function(req,res,next){
 }
 };
 
+// Create a post
 exports.dashboard_post = [
  body('content', 'Posts must contain a message').trim().notEmpty(),
  sanitizeBody('*').escape(),
+ 
  (req,res,next) =>{
   const errors = validationResult(req);
   var post = new Post({
@@ -58,6 +60,7 @@ exports.dashboard_post = [
   else{
    post.save(function(err){
     if(err){return next(err);}
+    // Posts can be created from different pages, redirect the user to the page they posted from
     var backURL=req.header('Referer') || '/';
     res.redirect(backURL);
    });
@@ -65,6 +68,7 @@ exports.dashboard_post = [
  }
 ];
 
+// Create a comment on a post
 exports.comment_post = [
  body('content', 'Comments must contain a message').trim().notEmpty(),
  sanitizeBody('*').escape(),
@@ -99,48 +103,54 @@ exports.comment_post = [
 
  }
  ];
- 
  exports.like = function(req,res,next){
   if(res.locals.currentUser){
+   // Comment can be created from different pages, redirect the user to the page they commented from
+   var backURL=req.header('Referer') || '/';
+   // Like or Unlike a post
    if(req.body.postid){
     Post.findOne({_id: req.body.postid}, function (err,post){
      if(err){return next(err)}
+     // Unlike a post
      if (post.likes.includes(res.locals.currentUser.id)){
       post.likes.pull(res.locals.currentUser.id);
       post.save(function(err){
        if(err){return next(err)}
-       res.redirect('/');
+       res.redirect(backURL);
       });
      }
+     // Like a post
      else{
       post.likes.push(res.locals.currentUser.id);
       post.save(function(err){
       if(err){return next(err)}
-       res.redirect('/');
+       res.redirect(backURL);
       });
      }
     });
    }
+   // Like or Unlike a comment
    else if(req.body.commentid){
     Comment.findOne({_id: req.body.commentid}, function (err,comment){
      if(err){return next(err)}
+     // Unlike a comment
      if (comment.likes.includes(res.locals.currentUser.id)){
       comment.likes.pull(res.locals.currentUser.id);
       comment.save(function(err){
        if(err){return next(err)}
-       res.redirect('/');
+       res.redirect(backURL);
       });
      }
+     // Like a comment
      else{
       comment.likes.push(res.locals.currentUser.id);
       comment.save(function(err){
       if(err){return next(err)}
-       res.redirect('/');
+       res.redirect(backURL);
       });
      }
     });
    }
-   
   }
   else{
    res.redirect('/');
